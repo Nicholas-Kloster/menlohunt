@@ -26,11 +26,11 @@ const colorGray = "\033[90m"
 
 func printBanner() {
 	banner := `
-    __  ___            __      __                      __
-   /  |/  /___  ____  / /___  / /_  __  ______  ______/ /_
-  / /|_/ / __ \/ __ \/ / __ \/ __ \/ / / / __ \/ __  / __/
- / /  / /  __/ / / / / /_/ / / / / /_/ / / / / /_/ / /_
-/_/  /_/\___/_/ /_/_/\____/_/ /_/\__,_/_/ /_/\__,_/\__/
+                      _       _                 _
+ _ __ ___   ___ _ __ | | ___ | |__  _   _ _ __ | |_
+| '_ ` + "`" + ` _ \ / _ \ '_ \| |/ _ \| '_ \| | | | '_ \| __|
+| | | | | |  __/ | | | | (_) | | | | |_| | | | | |_
+|_| |_| |_|\___|_| |_|_|\___/|_| |_|\__,_|_| |_|\__|
 `
 	fmt.Fprintf(os.Stderr, "%s%s%s", colorCyan, banner, colorReset)
 	fmt.Fprintf(os.Stderr, "%s  v%s — GCP External Attack Surface Management (EASM)%s\n", colorGray, version, colorReset)
