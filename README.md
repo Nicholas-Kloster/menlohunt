@@ -88,6 +88,40 @@ An open SSH port is a `LOW` severity finding. A leaked internal IP is `MEDIUM`.
 
 **menlohunt** recognizes that if they share the same host and a "remote-access" tag, they represent a correlated path. The tool uses a subset sum threshold (default 15) to surface these chains, transforming a flat list of noise into a prioritized list of breaches-in-waiting.
 
+## Semantic Intelligence: What Makes menlohunt Different
+
+Most scanners produce network maps. **menlohunt** produces logical blueprints.
+
+### 1. Port → Infrastructure (not just "Port 8082 is open")
+- **Nmap:** "Port 8082 is open."
+- **menlohunt:** "This is a WireGuard management node reading its peer list from a GCS bucket named `[COMPANY]-prod-usw2-catalog`."
+
+Other tools give you a network map. menlohunt gives you the architecture behind it.
+
+### 2. Extraction-Based Pivoting (The GCS Connection)
+Generic tools scan the IP and stop at the IP. menlohunt performs **extraction-based pivoting**: it uses names found in `/debug/vars` (bucket names, project IDs, regions) to automatically probe related GCS buckets and Firebase databases in Phase 4.
+
+You found a vulnerability on a Compute Engine VM. The loot is in a GCS Bucket. Other tools treat those as two separate universes. menlohunt treats them as one attack path.
+
+### 3. Management Plane vs. Data Plane Awareness
+Cloud tools suffer from **Port Bias**: they see WireGuard ports (51820) are closed and report "Your VPN is secure."
+
+The reality: the Data Plane is fine. The Management Plane — the code that *controls* the VPN — is exposed. Developers routinely forget to firewall secondary ports like 8082/8086 because they don't think metrics are dangerous. menlohunt proves that **metrics are just as dangerous as a shell**.
+
+### 4. Configuration vs. Reality (Bypassing IAM Blindness)
+Tools like Wiz and Prisma Cloud read your Google Cloud API settings.
+- **What they see:** "Firewall rule allows 8082." Flagged Medium.
+- **What they miss:** The developer passed a plaintext bucket name as a command-line flag.
+
+Those tools tell you the *rule* is bad. menlohunt proves the *payload* is lethal — it provides the evidence that turns an abstract warning into an emergency.
+
+### 5. Semantic Parsing of `/debug/vars`
+Nuclei has a template for `/debug/vars`. It reports: "Found expvar."
+
+menlohunt parses the `cmdline` array and extracts strings matching `-bucketName`, `-dbPath`, `-secretKey`, `-region`. It performs keyword extraction on exposed endpoints to surface GCP assets — automatically.
+
+---
+
 ## For the Red & Blue Teams
 - **Red Teams:** Use it for "first-strike" recon. Map the attack surface in seconds without triggering heavy internal IAM-based alarms.
 - **Blue Teams:** Use it for "Trust but Verify." Prove to stakeholders that your "internal-only" services are actually hidden from the public internet.
