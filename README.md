@@ -89,4 +89,69 @@ An open SSH port is a `LOW` severity finding. A leaked internal IP is `MEDIUM`.
 - **Blue Teams:** Use it for "Trust but Verify." Prove to stakeholders that your "internal-only" services are actually hidden from the public internet.
 
 ---
+
+## Real-World Case Study: Breaking the Management Plane
+
+During a zero-knowledge external scan against a GCP-native infrastructure provider, **menlohunt** identified two non-standard ports responding to HTTP. No credentials. No cloud console. No prior knowledge of the target.
+
+### Scan Output
+
+```text
+[menlohunt] v0.3.0  target=34.X.X.X  timeout=4s  retries=1
+[menlohunt] open ports: [8082, 8086]
+[menlohunt] phase 2 — protocol probes + HTTP fingerprinting…
+[menlohunt] phase 3 — TLS certificate analysis…
+[menlohunt] phase 4 — GCP surface (GCS, Firebase, metadata, Cloud Run)…
+[menlohunt] phase 5 — attack chain detection (threshold=15)…
+[menlohunt] done — 8 findings, 10 chains in 9.1s  [C:0 H:4 M:4 L:0 I:0]
+```
+
+### The Money Finding
+
+`/debug/vars` (Go expvar) was open on port 8082. It returned the full process command line:
+
+```json
+{
+  "cmdline": [
+    "/opt/app/bin/catalog-sync",
+    "-logLevel", "info",
+    "-bucketName", "[COMPANY]-prod-usw2-catalog",
+    "-bucketPrefix", "peers/",
+    "-region", "us-west-2"
+  ]
+}
+```
+
+### What That Tells You
+
+| Finding | Significance |
+|---------|-------------|
+| `/opt/app/bin/catalog-sync` | Binary path confirms this is a managed node, not a honeypot |
+| `[COMPANY]-prod-usw2-catalog` | GCS bucket name — instant pivot target for peer table enumeration |
+| `us-west-2` | Region and node tier confirmed without any cloud credentials |
+| Internal port `8085` (from 8086 expvar) | Private listener revealed — maps topology without touching it |
+
+### The Attack Chain
+
+```
+[chain 1] score=21  tags=[info-disclosure, metrics, management-plane]
+  MH-0004 → Management metrics exposed on port 8082 (Prometheus)
+  MH-0006 → Go expvar /debug/vars leaked full process cmdline (port 8082)
+  MH-0008 → Go expvar /debug/vars leaked full process cmdline (port 8086)
+```
+
+### Why Other Tools Miss This
+
+| Tool | What It Sees |
+|------|-------------|
+| **Nmap** | "Port 8082 open." Full stop. |
+| **Wiz / Prisma Cloud** | Firewall rule flagged Medium. Endpoint never pulled. |
+| **Nuclei** | `/debug/vars` template fires — reports "Found expvar." No extraction. |
+| **menlohunt** | Pulls `/debug/vars`, parses the `cmdline` JSON, extracts a GCS bucket name that maps the entire backend topology. No cloud credentials required. |
+
+**The Data Plane (WireGuard) was properly firewalled. The Management Plane was naked.**
+
+Most tools stop at "Port 8082 is open." **menlohunt** reads the response, identifies it as a management service, extracts a hidden GCS bucket name from the process flags, and checks that bucket for public exposure. It turns a network scan into a cloud asset discovery engine.
+
+---
 *Disclaimer: This tool is for authorized security auditing and educational purposes only.*
