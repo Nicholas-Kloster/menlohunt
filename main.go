@@ -21,6 +21,22 @@ import (
 
 const version = "0.3.0"
 
+const colorCyan = "\033[36m"
+const colorGray = "\033[90m"
+
+func printBanner() {
+	banner := `
+    __  ___            __      __                      __
+   /  |/  /___  ____  / /___  / /_  __  ______  ______/ /_
+  / /|_/ / __ \/ __ \/ / __ \/ __ \/ / / / __ \/ __  / __/
+ / /  / /  __/ / / / / /_/ / / / / /_/ / / / / /_/ / /_
+/_/  /_/\___/_/ /_/_/\____/_/ /_/\__,_/_/ /_/\__,_/\__/
+`
+	fmt.Fprintf(os.Stderr, "%s%s%s", colorCyan, banner, colorReset)
+	fmt.Fprintf(os.Stderr, "%s  v%s — GCP External Surface Hunter%s\n", colorGray, version, colorReset)
+	fmt.Fprintf(os.Stderr, "%s  \"Because the console only tells you half the story.\"%s\n\n", colorGray, colorReset)
+}
+
 const usage = `menlohunt v` + version + ` — GCP / redge external vulnerability scanner
 
 SUBCOMMANDS
@@ -40,6 +56,9 @@ EXAMPLES
 `
 
 func main() {
+	if len(os.Args) > 1 && os.Args[1] != "version" && os.Args[1] != "-version" && os.Args[1] != "--version" {
+		printBanner()
+	}
 	if len(os.Args) < 2 {
 		fmt.Print(usage)
 		os.Exit(1)
