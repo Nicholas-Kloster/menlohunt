@@ -1,5 +1,9 @@
 # menlohunt
 
+<p align="center">
+  <img src="screenshots/banner.svg" alt="menlohunt banner">
+</p>
+
 ### "Cloud security is broken if you only look from the inside."
 
 Most Cloud Security Posture Management (CSPM) tools require administrative access: IAM credentials, service accounts, or agents. They tell you what your configuration says—**not what an attacker actually sees.**
