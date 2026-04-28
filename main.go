@@ -33,8 +33,8 @@ func printBanner() {
 /_/  /_/\___/_/ /_/_/\____/_/ /_/\__,_/_/ /_/\__,_/\__/
 `
 	fmt.Fprintf(os.Stderr, "%s%s%s", colorCyan, banner, colorReset)
-	fmt.Fprintf(os.Stderr, "%s  v%s — GCP External Surface Hunter%s\n", colorGray, version, colorReset)
-	fmt.Fprintf(os.Stderr, "%s  \"Because the console only tells you half the story.\"%s\n\n", colorGray, colorReset)
+	fmt.Fprintf(os.Stderr, "%s  v%s — GCP External Attack Surface Management (EASM)%s\n", colorGray, version, colorReset)
+	fmt.Fprintf(os.Stderr, "%s  Zero-knowledge perimeter auditing and attack chain discovery.%s\n\n", colorGray, colorReset)
 }
 
 const usage = `menlohunt v` + version + ` — GCP / redge external vulnerability scanner

@@ -1,14 +1,13 @@
 # menlohunt
+### GCP External Attack Surface Management (EASM)
 
 <p align="center">
   <img src="screenshots/banner.svg" alt="menlohunt banner">
 </p>
 
-### "Cloud security is broken if you only look from the inside."
+Most cloud security tools (CSPMs) require administrative access: IAM credentials, service accounts, or agents. They tell you what your configuration says—**not what an attacker actually sees.**
 
-Most Cloud Security Posture Management (CSPM) tools require administrative access: IAM credentials, service accounts, or agents. They tell you what your configuration says—**not what an attacker actually sees.**
-
-**menlohunt** starts where an attacker starts: an IP address and nothing else. It provides a zero-knowledge, "Outside-In" perspective of your Google Cloud Platform (GCP) perimeter.
+**menlohunt** provides a zero-knowledge, "Outside-In" perspective of your Google Cloud Platform (GCP) perimeter. It mimics the reconnaissance phase of a motivated adversary to find architectural leaks that internal tools miss.
 
 **No credentials. No agent. No cloud account required. Just an IP and fifteen seconds.**
 
