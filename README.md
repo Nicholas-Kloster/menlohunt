@@ -194,3 +194,25 @@ Most tools stop at "Port 8082 is open." **menlohunt** reads the response, identi
 
 ---
 *Disclaimer: This tool is for authorized security auditing and educational purposes only.*
+
+---
+
+## Use with Claude Code
+
+menlohunt turns a single GCP IP into a full external attack surface map — use Claude Code to interpret the output and build the attack chain.
+
+```
+menlohunt is installed at ~/menlohunt/. Read README.md, then:
+1. Run menlohunt against [GCP IP] and show me the full output
+2. Identify which findings form a chained attack path (Phase correlations)
+3. Help me draft the disclosure write-up for the highest-severity chain
+Target: [GCP IP here]
+```
+
+```
+I have menlohunt Phase output for [IP]. Help me:
+1. Map the GCS bucket names extracted from /debug/vars to their public exposure status
+2. Determine if the Prometheus /metrics or expvar data reveals internal project IDs
+3. Chain the certificate SAN names into additional target IPs to pivot to
+Output: [paste menlohunt JSON or text output here]
+```
